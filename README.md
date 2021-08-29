@@ -14,6 +14,8 @@ Each role represents number which is used app wide:
 2. Configure .env file with database connection and mailing parameters.
 3. Run migrations with extra flag --seed (full command: php artisan migrate:refresh --seed) to crate all tables with users and drugs seeded.
 
+<b>All users password is 123456789</b>
+
 <b>API USAGE:</b><br>
     It is mandatory to use API password for full api ussage. Api password is shown in .env file as API_PASSWORD. Once password is correct, api usage is available untill sesion is destroyed. 
 
