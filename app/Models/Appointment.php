@@ -18,23 +18,38 @@ class Appointment extends Model
         'user_created'
     ];
 
-    public function user(){
-        return $this->belongsTo(User::class);
+    protected $with = ['doctor', 'patient'];
+
+    public function patient(){
+        return $this->hasOne(User::class, 'id','patient_id');
     }
 
-    public static function allAppointments(){
-        return DB::table('appointments')
-            ->select('appointments.id', 'p.name as p_name', 'd.name as d_name', 'appointments.datetime')
-            ->leftJoin('users as p', 'p.id', '=', 'appointments.patient_id')
-            ->leftJoin('users as d', 'd.id', '=', 'appointments.doctor_id')
-            ->where('appointments.is_temp', 0)->paginate(9);
+    public function doctor(){
+        return $this->hasOne(User::class, 'id','doctor_id');
     }
 
-    public static function oneAppointment($id){
-        return DB::table('appointments')
-            ->select('appointments.id', 'p.name as p_name', 'd.name as d_name', 'appointments.datetime')
-            ->leftJoin('users as p', 'p.id', '=', 'appointments.patient_id')
-            ->leftJoin('users as d', 'd.id', '=', 'appointments.doctor_id')
-            ->where('appointments.id', $id)->get(0);
+    public function scopeTemp($query, $isTemp)
+    {
+        return $query->where('is_temp', $isTemp);
+    }
+
+    public function scopeDoctor($query, $doctor)
+    {
+        return $query->where('doctor_id', $doctor);
+    }
+
+    public function scopePatient($query, $patient)
+    {
+        return $query->where('patient_id', $patient);
+    }
+
+    public function scopeDatetime($query, $date)
+    {
+        return $query->where('datetime', 'like', $date.'%');
+    }
+
+    public function scopeUserCreated($query, $user)
+    {
+        return $query->where('user_created', $user);
     }
 }

@@ -29,7 +29,6 @@ $(document).ready(function (){
                     'patient_id' : $('.appointment_patient').val(),
                 },
                 success:function(data) {
-                    console.log(data.success);
                 }
             });
         }
@@ -49,26 +48,21 @@ $(document).ready(function (){
                     '<th>Drug name</th>'+
                     '<th>Patient name</th>'+
                     '<th>Valid until</th>'+
-                    '<th>Created at</th>'+
                     '</tr>'+
                     '</thead>';
                 $.each(JSON.parse(data), function (key, value) {
-
                     result += '<tr>';
                     result += '<td>' +
                         value.id + '</td>';
 
                     result += '<td>' +
-                        value.d_name + '</td>';
+                        value.drug.name + '</td>';
 
                     result += '<td>' +
-                        value.p_name + '</td>';
+                        value.user.name + '</td>';
 
                     result += '<td>' +
                         value.valid_until + '</td>';
-
-                    result += '<td>' +
-                        value.created_at + '</td>';
 
                     result += '</tr>';
                 });

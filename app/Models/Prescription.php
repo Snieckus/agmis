@@ -10,42 +10,28 @@ class Prescription extends Model
 {
     use HasFactory;
 
+    protected $with = ['user', 'drug'];
+
     protected $fillable = [
         'user_id',
         'drug_id',
         'valid_until',
     ];
+    /**
+     * @var mixed
+     */
+    private $created_at;
 
     public function user(){
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function drug(){
-        return $this->hasOne(Drug::class);
+        return $this->hasOne(Drug::class, 'id', 'drug_id');
     }
 
-    public static function prescriptions(){
-        return DB::table('prescriptions')
-            ->select('prescriptions.id', 'p.name as p_name', 'd.name as d_name', 'prescriptions.valid_until', 'prescriptions.created_at')
-            ->leftJoin('users as p', 'p.id', '=', 'prescriptions.user_id')
-            ->leftJoin('drugs as d', 'd.id', '=', 'prescriptions.drug_id')
-            ->paginate(9);
+    public function scopeUser($query, $user)
+    {
+        return $query->where('user_id', $user);
     }
-
-    public static function prescriptionsApi(){
-        return DB::table('prescriptions')
-            ->select('prescriptions.id', 'p.name as p_name', 'd.name as d_name', 'prescriptions.valid_until', 'prescriptions.created_at')
-            ->leftJoin('users as p', 'p.id', '=', 'prescriptions.user_id')
-            ->leftJoin('drugs as d', 'd.id', '=', 'prescriptions.drug_id')
-            ->get();
-    }
-
-    public static function userPrescriptions($user_id){
-        return DB::table('prescriptions')
-            ->select('prescriptions.id', 'p.name as p_name', 'd.name as d_name', 'prescriptions.valid_until', 'prescriptions.created_at')
-            ->leftJoin('users as p', 'p.id', '=', 'prescriptions.user_id')
-            ->leftJoin('drugs as d', 'd.id', '=', 'prescriptions.drug_id')
-            ->where('prescriptions.user_id', $user_id)->get();
-    }
-
 }

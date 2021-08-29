@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuthApi;
 use App\Models\Appointment;
 use Illuminate\Contracts\Foundation\Application;
 use Session;
@@ -23,12 +24,10 @@ class ApiController extends Controller
         return view('api.index', compact('session'));
     }
 
-    public function auth(Request $request)
+    public function auth(AuthApi $request)
     {
-        $data = request()->validate([
-            'api_password' => 'required',
-        ]);
-        if($data['api_password'] == env('API_PASSWORD')){
+        $data = $request->input();
+        if($data['api_password'] == env('API_PASSWORD', 'fakePass')){
             Session::put('api', '1');
         }
         $session = Session::get('api');

@@ -2,28 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAppointment;
 use App\Models\Appointment;
 use App\Models\Prescription;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AjaxController extends Controller
 {
-    public function submitTempAppointment(Request $request){
-        $previous_temp_appointment = Appointment::where('user_created', auth()->user()->id)->where('is_temp', 1);
-        $previous_temp_appointment->delete();
+    public function submitTempAppointment(StoreAppointment $request){
+        $previous_temp_appointment = Appointment::query()->userCreated(auth()->user()->id)->temp(1)->get();
+        if(!$previous_temp_appointment->isEmpty()){
+            Appointment::destroy($previous_temp_appointment);
+        }
 
-        $data = request()->validate([
-            'patient_id'=>'required|integer',
-            'date'=>'required|String',
-            'time'=>'required|String',
-            'doctor_id'=>'required|integer',
-        ]);
+        $data = $request->input();
+
+        $data['user_created'] = auth()->user()->id;
         $data['is_temp'] = 1;
         $data['datetime'] = $data['date'].' '.$data['time'];
+
         unset($data['date']);
         unset($data['time']);
-        $data['user_created'] = auth()->user()->id;
 
         Appointment::create($data);
         return response()->json(['success'=>'Ajax request submitted successfully']);
@@ -35,7 +36,7 @@ class AjaxController extends Controller
             'doctor_id'=>'required|integer',
         ]);
 
-        $used_times = Appointment::select('datetime')->where('doctor_id', $data['doctor_id'])->where('datetime', 'like', $data['date'].'%')->get();
+        $used_times = Appointment::query()->doctor($data['doctor_id'])->datetime($data['date'])->get();
         $times = array();
         foreach ($used_times as $time){
             $exploded_time = explode(" ", $time['datetime']);
@@ -46,15 +47,14 @@ class AjaxController extends Controller
     }
 
     public function getApiData(Request $request){
+        $prescriptions = Prescription::all();
         if(!empty($request->user_email)){
             $data = request()->validate([
                 'user_email'=>'email',
             ]);
-            $user = User::where('email', $data['user_email'])->first();
+            $user = User::query()->email($data['user_email'])->first();
             if($user)
-                $prescriptions = Prescription::userPrescriptions($user->id);
-        }else{
-            $prescriptions = Prescription::prescriptionsApi();
+                $prescriptions = Prescription::query()->user($user->id)->get();
         }
         echo json_encode($prescriptions);
     }

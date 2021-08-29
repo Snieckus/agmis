@@ -46,6 +46,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function scopeRole($query, $role_id)
+    {
+        return $query->where('role', $role_id);
+    }
+
+    public function scopeEmail($query, $email)
+    {
+        return $query->where('email', $email);
+    }
+
     public function appointments(){
         return $this->hasMany(Appointment::class);
     }

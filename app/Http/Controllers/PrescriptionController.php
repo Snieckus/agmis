@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePrescription;
 use App\Mail\PrescriptionAssigned;
 use App\Models\Appointment;
 use App\Models\Drug;
 use App\Models\Prescription;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
 
 class PrescriptionController extends Controller
@@ -15,22 +21,22 @@ class PrescriptionController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
+     * @return Application|Factory|View|Response
      */
     public function index()
     {
-        $prescriptions = Prescription::prescriptions();
+        $prescriptions = Prescription::paginate(9);
         return view('prescriptions.index', compact('prescriptions'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
+     * @return Application|Factory|View|Response
      */
     public function create()
     {
-        $patients = User::where('role', 1)->get();
+        $patients = User::query()->role(1)->get();
         $drugs = Drug::all();
         return view('prescriptions.create', compact('patients', 'drugs'));
     }
@@ -38,76 +44,36 @@ class PrescriptionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
+     * @param StorePrescription $request
+     * @return Application|Factory|View|Response
      */
-    public function store(Request $request)
+    public function store(StorePrescription $request)
     {
-        $data = request()->validate([
-            'user_id' => 'required|integer',
-            'drug_id' => 'required|integer',
-            'valid_until' => 'required|String',
-        ]);
-
+        $data = $request->input();
         $user = User::findOrFail($data['user_id']);
 
         $id = Prescription::create($data);
         if($id && $user){
             Mail::to($user)->send(new PrescriptionAssigned($id));
         }
-        $prescriptions = Prescription::prescriptions();
+        $prescriptions = Prescription::paginate(9);
         return view('prescriptions.index', compact('prescriptions'))->with('status', 'Prescription registered');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @param Prescription $prescription
+     * @return RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(Prescription $prescription)
     {
-        $prescription = Prescription::findOrFail($id);
         $return_status = 'Prescription can be canceled until 1 hour after being created';
         if(strtotime($prescription->created_at. '+1 hour') >= strtotime(date('Y-m-d H:i:s'))){
             $prescription->delete();
             $return_status = 'Prescription canceled';
         }
-        $prescriptions = Prescription::prescriptions();
+        $prescriptions = Prescription::paginate(9);
         return redirect()->route('prescriptions.index', compact('prescriptions'))->with('status', $return_status);
     }
 }

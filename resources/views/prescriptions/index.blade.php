@@ -28,8 +28,8 @@
                                 @foreach($prescriptions as $prescription)
                                     <tr>
                                         <td>{{$prescription->id}}</td>
-                                        <td>{{$prescription->p_name}}</td>
-                                        <td>{{$prescription->d_name}}</td>
+                                        <td>{{$prescription->user->name}}</td>
+                                        <td>{{$prescription->drug->name}}</td>
                                         <td>{{current(explode(" ",$prescription->valid_until))}}</td>
                                         <td>{{$prescription->created_at}}</td>
                                         <td>
@@ -37,6 +37,7 @@
                                                 <form action="/prescriptions/{{$prescription->id}}" method="post" style='display:inline;' >
                                                     @csrf
                                                     @method('DELETE')
+                                                    <input type="hidden" name="prescription_id" value="{{$prescription->id}}"/>
                                                     <i title="Cancel" style="cursor:pointer" onclick="if(confirm('Are you sure?')){ $(this).closest('form').submit() }"  class="far fa-window-close"></i>
                                                 </form>
                                             @endif

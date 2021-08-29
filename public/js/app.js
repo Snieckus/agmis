@@ -1868,9 +1868,7 @@ $(document).ready(function () {
           'doctor_id': $('.appointment_doctor').val(),
           'patient_id': $('.appointment_patient').val()
         },
-        success: function success(data) {
-          console.log(data.success);
-        }
+        success: function success(data) {}
       });
     }
   });
@@ -1883,14 +1881,13 @@ $(document).ready(function () {
         'user_email': $('#user_email').val()
       },
       success: function success(data) {
-        var result = '<table class="table table-bordered"><thead>' + '<tr>' + '<th>ID</th>' + '<th>Drug name</th>' + '<th>Patient name</th>' + '<th>Valid until</th>' + '<th>Created at</th>' + '</tr>' + '</thead>';
+        var result = '<table class="table table-bordered"><thead>' + '<tr>' + '<th>ID</th>' + '<th>Drug name</th>' + '<th>Patient name</th>' + '<th>Valid until</th>' + '</tr>' + '</thead>';
         $.each(JSON.parse(data), function (key, value) {
           result += '<tr>';
           result += '<td>' + value.id + '</td>';
-          result += '<td>' + value.d_name + '</td>';
-          result += '<td>' + value.p_name + '</td>';
+          result += '<td>' + value.drug.name + '</td>';
+          result += '<td>' + value.user.name + '</td>';
           result += '<td>' + value.valid_until + '</td>';
-          result += '<td>' + value.created_at + '</td>';
           result += '</tr>';
         });
         result += '</table>';

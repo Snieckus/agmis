@@ -36,8 +36,8 @@
                             </form>
                         </div>
                         <div class="card-body">
-                            <b>Patient: </b>{{$app->p_name}}<br>
-                            <b>Doctor: </b>{{$app->d_name}}<br>
+                            <b>Patient: </b>{{$app->patient->name}}<br>
+                            <b>Doctor: </b>{{$app->doctor->name}}<br>
                             <b>Time: </b>{{$app->datetime}}
                         </div>
                     </div>

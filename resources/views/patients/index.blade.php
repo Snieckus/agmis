@@ -2,94 +2,39 @@
 
 @section('content')
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">{{ __('Make an appointment') }}</div>
-
-                    <div class="card-body">
-                        @if (session('status'))
-                            <div class="alert alert-success" role="alert">
-                                {{ session('status') }}
-                            </div>
-                        @endif
-                        <form method="POST" action="{{ route('register') }}">
-                            @csrf
-                            <div class="form-group row">
-                                <label for="patient_id" class="col-md-4 col-form-label text-md-right">{{ __('Patient') }}</label>
-                                <div class="col-md-6">
-                                    <select name="patient_id" class="form-control js-example-basic-single">
-                                        @foreach($users as $user)
-                                            @if($user->role==1)
-                                                <option>{{$user->name}}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-
-                                    @error('patient_id')
-                                    <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="doctor_id" class="col-md-4 col-form-label text-md-right">{{ __('Doctor') }}</label>
-                                <div class="col-md-6">
-                                    <select name="doctor_id" class="form-control js-example-basic-single">
-                                        @foreach($users as $user)
-                                            @if($user->role==2)
-                                                <option>{{$user->name}}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-
-                                    @error('doctor_id')
-                                    <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="date" class="col-md-4 col-form-label text-md-right">{{ __('Date') }}</label>
-
-                                <div class="col-md-6">
-                                    <input id="date" type="date" class="form-control @error('date') is-invalid @enderror" name="date" required>
-
-                                    @error('date')
-                                    <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="form-group row d-flex justify-content-center">
-                                <div class="card">
-                                    <div class="card-header">{{ __('Time') }}</div>
-                                    <div class="card-body">
-                                        @foreach($time_array as $time)
-                                            <input type="radio" id="{{$time}}" name="time"><label for="{{$time}}">{{$time}}</label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group row mb-0">
-                                <div class="col-md-6 offset-md-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        {{ __('Register') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+        @if (session('status'))
+            <div class="row">
+                <div class="col-lg-12 alert alert-success" role="alert">
+                    {{ session('status') }}
                 </div>
             </div>
+        @endif
+        <div class="row justify-content-center">
+            @if(count($appointments) <= 0)
+                <div class="col-md-4 pb-4">
+                    <div class="card">
+                        <div class="card-header">{{ __('Appointments') }}</div>
+                        <div class="card-body">
+                            There are no appointments!
+                        </div>
+                    </div>
+                </div>
+            @else
+                @foreach($appointments as $app)
+                    <div class="col-md-4 pb-4">
+                        <div class="card">
+                            <div class="card-header">{{ __('Appointment No. ').$app->id }}
+                            </div>
+                            <div class="card-body">
+                                <b>Patient: </b>{{$app->patient->name}}<br>
+                                <b>Doctor: </b>{{$app->doctor->name}}<br>
+                                <b>Time: </b>{{$app->datetime}}
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
         </div>
+        {{ $appointments->links() }}
     </div>
-
 @endsection

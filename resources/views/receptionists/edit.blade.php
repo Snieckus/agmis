@@ -17,12 +17,13 @@
                             @method('PATCH')
                             <div class="form-group row">
                                 <label for="patient_id" class="col-md-4 col-form-label text-md-right"><b>{{ __('Patient') }}</b></label>
-                                <label for="patient_id" class="col-md-4 col-form-label">{{ $appointment->p_name }}</label>
+                                <label for="patient_id" class="col-md-4 col-form-label">{{ $appointment->patient->name }}</label>
                             </div>
 
                             <div class="form-group row">
                                 <label for="doctor_id" class="col-md-4 col-form-label text-md-right"><b>{{ __('Doctor') }}</b></label>
-                                <label for="doctor_id" class="col-md-4 col-form-label">{{ $appointment->d_name }}</label>
+                                <label for="doctor_id" class="col-md-4 col-form-label">{{ $appointment->doctor->name }}</label>
+                                <input type="hidden" value="{{$appointment->doctor->id}}" class="appointment_doctor">
                             </div>
 
                             <div class="form-group row">
